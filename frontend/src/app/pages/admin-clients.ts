@@ -1,0 +1,14 @@
+import { Component, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Api, EstadoUsuario, Page, Usuario, message } from '../core/api';
+@Component({selector:'app-admin-clients',imports:[FormsModule,DatePipe],template:`
+  <div class="page-heading"><div><p class="eyebrow">ADMINISTRACIÓN / ACCESO</p><h1>Cuida a tus <em>clientes.</em></h1><p>Aprueba nuevos registros y mantén el acceso bajo control.</p></div><button class="button secondary" (click)="load()">Actualizar ↻</button></div>
+  @if(error()){<p class="notice error" role="alert">{{error()}}</p>} @if(note()){<p class="notice success" role="status">{{note()}}</p>}
+  <div class="filter-row"><label>Filtrar estado<select [(ngModel)]="estado" (change)="load()"><option value="">Todos</option><option value="PENDIENTE">Pendientes</option><option value="ACTIVO">Activos</option><option value="INACTIVO">Inactivos</option></select></label><span class="count-label">{{data()?.total??0}} registros</span></div>
+  @if(busy()){<div class="loading">Consultando clientes…</div>} @else {<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Cliente</th><th>Registro</th><th>Estado</th><th>Gestión</th></tr></thead><tbody>@for(u of data()?.contenido;track u.usuarioSub){<tr><td><strong class="mono">{{u.usuarioSub}}</strong><small>Identidad Keycloak</small></td><td>{{u.fechaRegistro|date:'dd/MM/yyyy HH:mm'}}</td><td><span class="badge" [class.active]="u.estado==='ACTIVO'" [class.pending]="u.estado==='PENDIENTE'" [class.inactive]="u.estado==='INACTIVO'">{{u.estado}}</span></td><td><div class="row-actions">@if(u.estado==='PENDIENTE'){<button class="text-button" (click)="change(u,'aprobar')">Aprobar</button>} @if(u.estado==='ACTIVO'){<button class="text-button danger-text" (click)="change(u,'desactivar')">Desactivar</button>} @if(u.estado==='INACTIVO'){<button class="text-button" (click)="change(u,'reactivar')">Reactivar</button>}</div></td></tr>} @empty{<tr><td colspan="4" class="empty-cell">No hay clientes con este filtro.</td></tr>}</tbody></table></div>}`})
+export class AdminClients {
+  private readonly api=inject(Api); readonly data=signal<Page<Usuario>|null>(null); readonly busy=signal(false);readonly error=signal('');readonly note=signal('');estado=''; constructor(){void this.load();}
+  async load(){this.busy.set(true);this.error.set('');try{this.data.set(await this.api.get<Page<Usuario>>('/usuarios?tamano=100'+(this.estado?'&estado='+this.estado:'')));}catch(e){this.error.set(message(e));}finally{this.busy.set(false);}}
+  async change(u:Usuario, action:'aprobar'|'desactivar'|'reactivar'){this.error.set('');try{await this.api.patch('/usuarios/'+encodeURIComponent(u.usuarioSub)+'/'+action);this.note.set('Estado de '+u.usuarioSub+' actualizado.');await this.load();}catch(e){this.error.set(message(e));}}
+}

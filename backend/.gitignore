@@ -1,0 +1,49 @@
+# Compilación Java
+**/target/
+*.class
+*.jar
+*.war
+!**/.mvn/wrapper/maven-wrapper.jar
+
+# Entorno y credenciales
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.ppk
+*.key
+*.p12
+*.pfx
+*.jks
+credentials
+secrets/
+**/secrets/
+**/application-local.yml
+**/application-local.yaml
+**/application-local.properties
+
+# Estado local, logs y herramientas
+**/data/
+**/logs/
+*.log
+tmp/
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+.DS_Store
+Thumbs.db
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# Respaldos y paquetes de despliegue
+*.dump
+*.backup
+*.zip
+*.tar
+*.tar.gz

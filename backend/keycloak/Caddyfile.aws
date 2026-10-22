@@ -1,0 +1,19 @@
+auth.54-172-114-153.sslip.io {
+    handle /api/* {
+        reverse_proxy host.docker.internal:8084
+    }
+
+    @oidc path /realms/banco-cloud/* /resources/* /.well-known/*
+    handle @oidc {
+        reverse_proxy keycloak:8080 {
+            header_up -Forwarded
+            header_up -X-Forwarded-Prefix
+            header_up X-Forwarded-Port 443
+        }
+    }
+    handle {
+        root * /srv/browser
+        try_files {path} /index.html
+        file_server
+    }
+}

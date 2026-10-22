@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: ms-inscripciones
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+server:
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  port: ${SERVER_PORT:8083}
+banco:
+  security:
+    issuer: ${KEYCLOAK_ISSUER:http://localhost:8080/realms/banco-cloud}
+    jwks: ${KEYCLOAK_JWKS:http://localhost:8080/realms/banco-cloud/protocol/openid-connect/certs}
+    audience: banco-cloud-api
+  usuarios-url: ${USUARIOS_URL:http://localhost:8082}
+  beneficios-url: ${BENEFICIOS_URL:http://localhost:8081}
